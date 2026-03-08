@@ -1,0 +1,28 @@
+id = "1314857132578967552"
+name = "[YESUI] Raiden Ei 4K/60FPS Part:2"
+archived = true
+locked = false
+createdAt = "2024-12-07T07:32:49.271Z"
+autoArchiveDuration = 4320
+messageCount = 2
+appliedTags = []
+
+[[messages]]
+id = "1314857132578967552"
+author = "korieuko"
+content = "https://avbebe.com/archives/240530"
+createdAt = "2024-12-07T07:32:49.271Z"
+pinned = false
+attachments = "https://cdn.discordapp.com/attachments/1314857132578967552/1314857314255376404/Screenshot_2024-12-07-13-03-17-869_com.kiwibrowser.browser.png?ex=69ae77cc&is=69ad264c&hm=f5a172343c7e83b2f838472df03123bba986e2b23e41398b95546c99949b34f1&"
+thumbnail = ""
+linkPreviews = []
+
+[[messages]]
+id = "1314857426708725790"
+author = "korieuko"
+content = "[YESUI] Raiden Ei 4K/60FPS Part:2"
+createdAt = "2024-12-07T07:33:59.397Z"
+pinned = false
+attachments = ""
+thumbnail = ""
+linkPreviews = []

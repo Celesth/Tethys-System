@@ -1,0 +1,24 @@
+id = "1468225525049856032"
+name = "columbina nsfw"
+archived = true
+locked = false
+createdAt = "2026-02-03T12:44:03.483Z"
+autoArchiveDuration = 4320
+messageCount = 1
+appliedTags = []
+
+[[messages]]
+id = "1468225525049856032"
+author = "korieuko"
+content = "https://rule34video.com/video/4226698/columbina-nsfw/"
+createdAt = "2026-02-03T12:44:03.483Z"
+pinned = false
+attachments = ""
+thumbnail = "https://rule34video.com/contents/videos_screenshots/4226000/4226698/preview.jpg"
+
+[[messages.linkPreviews]]
+url = "https://rule34video.com/video/4226698/columbina-nsfw/"
+title = "Columbina NSFW"
+image = "https://rule34video.com/contents/videos_screenshots/4226000/4226698/preview.jpg"
+site = "rule34video.com"
+desc = "Columbina and dottore"

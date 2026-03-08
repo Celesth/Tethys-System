@@ -1,0 +1,24 @@
+id = "1397785765576183919"
+name = "【Wuthering Waves】Carlotta"
+archived = true
+locked = false
+createdAt = "2025-07-24T03:41:36.117Z"
+autoArchiveDuration = 4320
+messageCount = 1
+appliedTags = []
+
+[[messages]]
+id = "1397785765576183919"
+author = "korieuko"
+content = "https://www.iwara.tv/video/JMAgd5VDAdVJoo/wuthering-wavescarlotta"
+createdAt = "2025-07-24T03:41:36.117Z"
+pinned = false
+attachments = "https://cdn.discordapp.com/attachments/1397785765576183919/1397785766486343691/thumbnail-00.jpg?ex=69ae4170&is=69aceff0&hm=1d96f3c329a70777204f5264af2c8444a60b082e593c3274aae7bec3b64502c8&"
+thumbnail = ""
+
+[[messages.linkPreviews]]
+url = "https://www.iwara.tv/video/JMAgd5VDAdVJoo/wuthering-wavescarlotta"
+title = "Iwara"
+image = ""
+site = "www.iwara.tv"
+desc = "Iwara"

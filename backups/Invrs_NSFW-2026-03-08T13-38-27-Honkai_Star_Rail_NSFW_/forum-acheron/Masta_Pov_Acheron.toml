@@ -1,0 +1,24 @@
+id = "1315732848665165934"
+name = "Masta Pov: Acheron"
+archived = true
+locked = false
+createdAt = "2024-12-09T17:32:36.256Z"
+autoArchiveDuration = 4320
+messageCount = 1
+appliedTags = []
+
+[[messages]]
+id = "1315732848665165934"
+author = "korieuko"
+content = "https://x.com/Masta_pov/status/1862198575683576145"
+createdAt = "2024-12-09T17:32:36.256Z"
+pinned = false
+attachments = ""
+thumbnail = "https://abs.twimg.com/responsive-web/server-ssr/icon-ios.77d25eba.png"
+
+[[messages.linkPreviews]]
+url = "https://twitter.com/Masta_pov/status/1862198575683576145"
+title = "X"
+image = "https://abs.twimg.com/responsive-web/server-ssr/icon-ios.77d25eba.png"
+site = "twitter.com"
+desc = ""

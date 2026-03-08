@@ -1,0 +1,18 @@
+id = "1314858142105866293"
+name = "[YESUI] Ganyu"
+archived = true
+locked = false
+createdAt = "2024-12-07T07:36:49.961Z"
+autoArchiveDuration = 4320
+messageCount = 1
+appliedTags = []
+
+[[messages]]
+id = "1314858142105866293"
+author = "korieuko"
+content = "https://avbebe.com/archives/198843"
+createdAt = "2024-12-07T07:36:49.961Z"
+pinned = false
+attachments = ""
+thumbnail = ""
+linkPreviews = []

@@ -1,0 +1,12 @@
+id = "1465372498655969574"
+name = "Arknights Endfield[NSFW]"
+guildId = "1314839006717935696"
+guildName = "Invrs ✦ NSFW"
+backedUpAt = "2026-03-08T12:46:08.943Z"
+contents = ["forum: forum-laevatain", "forum: forum-yvonne", "forum: forum-fluorite", "forum: forum-chen-qianyu"]
+
+[stats]
+totalForums = 4
+totalChannels = 0
+totalThreads = 19
+totalMessages = 20
