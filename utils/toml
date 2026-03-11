@@ -1,0 +1,155 @@
+/**
+ * Minimal TOML writer — supports strings, numbers, booleans, nulls,
+ * arrays of primitives, and nested tables/arrays of tables.
+ * No external dependencies.
+ */
+
+function escapeStr(s) {
+  return String(s)
+    .replace(/\\/g, '\\\\')
+    .replace(/"/g, '\\"')
+    .replace(/\n/g, '\\n')
+    .replace(/\r/g, '\\r')
+    .replace(/\t/g, '\\t');
+}
+
+function isPrimitive(v) {
+  return v === null || v === undefined || typeof v === 'string' ||
+    typeof v === 'number' || typeof v === 'boolean';
+}
+
+function serializePrimitive(v) {
+  if (v === null || v === undefined) return '""';
+  if (typeof v === 'boolean') return v ? 'true' : 'false';
+  if (typeof v === 'number') return isFinite(v) ? String(v) : '0';
+  return `"${escapeStr(v)}"`;
+}
+
+function isArrayOfPrimitives(arr) {
+  return Array.isArray(arr) && arr.every(isPrimitive);
+}
+
+function serializeArray(arr) {
+  return '[' + arr.map(serializePrimitive).join(', ') + ']';
+}
+
+function serialize(obj, prefix = '') {
+  const lines   = [];
+  const tables  = [];
+  const arrTabs = [];
+
+  for (const [key, val] of Object.entries(obj)) {
+    if (val === null || val === undefined) {
+      lines.push(`${key} = ""`);
+    } else if (isPrimitive(val)) {
+      lines.push(`${key} = ${serializePrimitive(val)}`);
+    } else if (isArrayOfPrimitives(val)) {
+      lines.push(`${key} = ${serializeArray(val)}`);
+    } else if (Array.isArray(val)) {
+      arrTabs.push([key, val]);
+    } else if (typeof val === 'object') {
+      tables.push([key, val]);
+    }
+  }
+
+  let out = lines.join('\n');
+
+  for (const [key, val] of tables) {
+    const fullKey = prefix ? `${prefix}.${key}` : key;
+    out += `\n\n[${fullKey}]\n`;
+    out += serialize(val, fullKey);
+  }
+
+  for (const [key, arr] of arrTabs) {
+    const fullKey = prefix ? `${prefix}.${key}` : key;
+    for (const item of arr) {
+      out += `\n\n[[${fullKey}]]\n`;
+      out += serialize(item, fullKey);
+    }
+  }
+
+  return out;
+}
+
+function stringify(obj) {
+  return serialize(obj).trim() + '\n';
+}
+
+module.exports = { stringify };/**
+ * Minimal TOML writer — supports strings, numbers, booleans, nulls,
+ * arrays of primitives, and nested tables/arrays of tables.
+ * No external dependencies.
+ */
+
+function escapeStr(s) {
+  return String(s)
+    .replace(/\\/g, '\\\\')
+    .replace(/"/g, '\\"')
+    .replace(/\n/g, '\\n')
+    .replace(/\r/g, '\\r')
+    .replace(/\t/g, '\\t');
+}
+
+function isPrimitive(v) {
+  return v === null || v === undefined || typeof v === 'string' ||
+    typeof v === 'number' || typeof v === 'boolean';
+}
+
+function serializePrimitive(v) {
+  if (v === null || v === undefined) return '""';
+  if (typeof v === 'boolean') return v ? 'true' : 'false';
+  if (typeof v === 'number') return isFinite(v) ? String(v) : '0';
+  return `"${escapeStr(v)}"`;
+}
+
+function isArrayOfPrimitives(arr) {
+  return Array.isArray(arr) && arr.every(isPrimitive);
+}
+
+function serializeArray(arr) {
+  return '[' + arr.map(serializePrimitive).join(', ') + ']';
+}
+
+function serialize(obj, prefix = '') {
+  const lines   = [];
+  const tables  = [];
+  const arrTabs = [];
+
+  for (const [key, val] of Object.entries(obj)) {
+    if (val === null || val === undefined) {
+      lines.push(`${key} = ""`);
+    } else if (isPrimitive(val)) {
+      lines.push(`${key} = ${serializePrimitive(val)}`);
+    } else if (isArrayOfPrimitives(val)) {
+      lines.push(`${key} = ${serializeArray(val)}`);
+    } else if (Array.isArray(val)) {
+      arrTabs.push([key, val]);
+    } else if (typeof val === 'object') {
+      tables.push([key, val]);
+    }
+  }
+
+  let out = lines.join('\n');
+
+  for (const [key, val] of tables) {
+    const fullKey = prefix ? `${prefix}.${key}` : key;
+    out += `\n\n[${fullKey}]\n`;
+    out += serialize(val, fullKey);
+  }
+
+  for (const [key, arr] of arrTabs) {
+    const fullKey = prefix ? `${prefix}.${key}` : key;
+    for (const item of arr) {
+      out += `\n\n[[${fullKey}]]\n`;
+      out += serialize(item, fullKey);
+    }
+  }
+
+  return out;
+}
+
+function stringify(obj) {
+  return serialize(obj).trim() + '\n';
+}
+
+module.exports = { stringify };

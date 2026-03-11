@@ -1,0 +1,150 @@
+/**
+ * checkPerms.js — command permission guard
+ *
+ * Reads permissions.json from the project root.
+ * Called in interactionCreate before every command execution.
+ *
+ * Usage:
+ *   const { checkPerms } = require('./utils/checkPerms');
+ *   const result = checkPerms(interaction);
+ *   if (!result.allowed) return interaction.reply({ content: result.message, ephemeral: true });
+ */
+
+/**
+ * checkPerms.js — command permission guard
+ *
+ * Reads permissions.json from the project root.
+ * Called in interactionCreate before every command execution.
+ *
+ * Usage:
+ *   const { checkPerms } = require('./utils/checkPerms');
+ *   const result = checkPerms(interaction);
+ *   if (!result.allowed) return interaction.reply({ content: result.message, flags: 64 });
+ */
+
+const fs   = require('fs');
+const path = require('path');
+const { PermissionsBitField } = require('discord.js');
+
+const PERMS_FILE = path.join(__dirname, '..', 'permissions.json');
+
+// Cache the file in memory — reloaded if it changes on disk
+let _cache     = null;
+let _cacheTime = 0;
+const CACHE_TTL = 10_000; // re-read every 10s so edits take effect without restart
+
+function _writeDefault() {
+  try {
+    const tmp = PERMS_FILE + '.tmp';
+    fs.writeFileSync(tmp, JSON.stringify({}, null, 2), 'utf8');
+    fs.renameSync(tmp, PERMS_FILE);
+  } catch { /* non-fatal */ }
+}
+
+function loadPerms() {
+  const now = Date.now();
+  if (_cache && now - _cacheTime < CACHE_TTL) return _cache;
+  try {
+    const raw = fs.readFileSync(PERMS_FILE, 'utf8').trim();
+    if (!raw) {
+      // Empty file — rewrite it so the error stops repeating
+      console.warn('[checkPerms] permissions.json is empty — rewriting. All commands open until fixed.');
+      _writeDefault();
+      _cache = {}; _cacheTime = now;
+      return _cache;
+    }
+    _cache     = JSON.parse(raw);
+    _cacheTime = now;
+    return _cache;
+  } catch (err) {
+    if (err.code === 'ENOENT') {
+      _writeDefault(); // create missing file silently
+    } else {
+      console.error('[checkPerms] Failed to read permissions.json:', err.message,
+                    '— commands open until fixed.');
+    }
+    _cache = {}; _cacheTime = now;
+    return _cache;
+  }
+}
+
+/**
+ * Check whether the interaction's member is allowed to run the command.
+ *
+ * @param {import('discord.js').ChatInputCommandInteraction} interaction
+ * @returns {{ allowed: boolean, message: string }}
+ */
+function checkPerms(interaction) {
+  const perms  = loadPerms();
+  const name   = interaction.commandName;
+  const member = interaction.member;
+
+  // No entry in permissions.json → unrestricted
+  const rule = perms[name];
+  if (!rule) return { allowed: true };
+
+  // Disabled entirely
+  if (rule.disabled) {
+    return {
+      allowed: false,
+      message: `❌ \`/${name}\` is currently disabled.`,
+    };
+  }
+
+  // Bot owner override — set OWNER_ID in .env to always bypass
+  const ownerId = process.env.OWNER_ID;
+  if (ownerId && interaction.user.id === ownerId) return { allowed: true };
+
+  // Server owner always passes
+  if (interaction.guild?.ownerId === interaction.user.id) return { allowed: true };
+
+  // Explicit user allowlist
+  const allowedUsers = rule.users ?? [];
+  if (allowedUsers.includes(interaction.user.id)) return { allowed: true };
+
+  // Role check
+  const allowedRoles = rule.roles ?? [];
+  if (allowedRoles.length > 0) {
+    const hasRole = allowedRoles.some(roleId => member.roles?.cache?.has(roleId));
+    if (hasRole) return { allowed: true };
+  }
+
+  // Permission flag check
+  const allowedPerms = rule.permissions ?? [];
+  if (allowedPerms.length > 0) {
+    const memberPerms = member.permissions;
+    for (const flagName of allowedPerms) {
+      // Support both "Administrator" and "PermissionFlagsBits.Administrator" style
+      const clean = flagName.replace('PermissionFlagsBits.', '');
+      try {
+        const bit = PermissionsBitField.Flags[clean];
+        if (bit !== undefined && memberPerms?.has(bit)) return { allowed: true };
+      } catch {
+        console.warn(`[checkPerms] Unknown permission flag: "${flagName}"`);
+      }
+    }
+  }
+
+  // Nothing matched — build a helpful denial message
+  const parts = [];
+  if (allowedRoles.length)  parts.push(`roles: ${allowedRoles.map(r => `<@&${r}>`).join(', ')}`);
+  if (allowedPerms.length)  parts.push(`permissions: ${allowedPerms.join(', ')}`);
+
+  return {
+    allowed: false,
+    message: parts.length
+    ? `❌ You don't have permission to use \`/${name}\`.\nRequires ${parts.join(' or ')}.`
+    : `❌ You don't have permission to use \`/${name}\`.`,
+  };
+}
+
+/**
+ * Reload the permissions cache immediately (e.g. after an admin edits the file).
+ */
+function reloadPerms() {
+  _cache     = null;
+  _cacheTime = 0;
+  return loadPerms();
+}
+
+module.exports = { checkPerms, reloadPerms };

@@ -1,0 +1,186 @@
+/**
+ * OG Tag Fetcher — server-side, no CORS issues.
+ * Extracts og:image, og:title, og:description, og:site_name from a URL.
+ * Uses Node's built-in https/http — zero extra dependencies.
+ *
+ * Results are cached in memory for the duration of the backup run.
+ * Cache is also persisted to og-cache.json so subsequent backups skip refetching.
+ */
+
+const https   = require('https');
+const http    = require('http');
+const fs      = require('fs');
+const path    = require('path');
+
+const CACHE_FILE = path.join(__dirname, '..', 'og-cache.json');
+const CACHE_TTL  = 7 * 24 * 60 * 60 * 1000; // 7 days in ms
+const TIMEOUT_MS = 6000;
+const MAX_BYTES  = 80_000; // read first ~80kb — enough for <head>
+
+// ── Load persistent cache ──────────────────────────────────────
+let diskCache = {};
+try {
+  if (fs.existsSync(CACHE_FILE)) {
+    diskCache = JSON.parse(fs.readFileSync(CACHE_FILE, 'utf8'));
+    // Prune expired
+    const now = Date.now();
+    for (const [url, entry] of Object.entries(diskCache)) {
+      if (now - entry.cachedAt > CACHE_TTL) delete diskCache[url];
+    }
+  }
+} catch { diskCache = {}; }
+
+const memCache  = new Map(); // url → OGData | 'error'
+const inFlight  = new Map(); // url → Promise
+
+function saveDiskCache() {
+  try { fs.writeFileSync(CACHE_FILE, JSON.stringify(diskCache, null, 2), 'utf8'); } catch { /* ignore */ }
+}
+
+// ── Fetch raw HTML (first MAX_BYTES) ───────────────────────────
+function fetchHtml(url) {
+  return new Promise((resolve, reject) => {
+    const mod     = url.startsWith('https') ? https : http;
+    const timeout = setTimeout(() => { req.destroy(); reject(new Error('timeout')); }, TIMEOUT_MS);
+
+    const req = mod.get(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; TethysBackup/1.0)',
+        'Accept': 'text/html',
+      },
+      timeout: TIMEOUT_MS,
+    }, (res) => {
+      // Follow redirects (max 3)
+      if ([301, 302, 303, 307, 308].includes(res.statusCode) && res.headers.location) {
+        clearTimeout(timeout);
+        req.destroy();
+        // Resolve relative redirects
+        try {
+          const next = new URL(res.headers.location, url).href;
+          resolve(fetchHtml(next));
+        } catch { reject(new Error('bad redirect')); }
+        return;
+      }
+
+      if (res.statusCode !== 200) {
+        clearTimeout(timeout);
+        req.destroy();
+        reject(new Error(`HTTP ${res.statusCode}`));
+        return;
+      }
+
+      const chunks = [];
+      let total    = 0;
+      res.on('data', chunk => {
+        chunks.push(chunk);
+        total += chunk.length;
+        if (total >= MAX_BYTES) { req.destroy(); }
+      });
+      res.on('end', () => { clearTimeout(timeout); resolve(Buffer.concat(chunks).toString('utf8')); });
+      res.on('error', e => { clearTimeout(timeout); reject(e); });
+    });
+
+    req.on('error', e => { clearTimeout(timeout); reject(e); });
+  });
+}
+
+// ── Parse OG tags from HTML string ────────────────────────────
+function parseOG(html, url) {
+  const get = (prop) => {
+    const m = html.match(new RegExp(`<meta[^>]+property=["']${prop}["'][^>]+content=["']([^"']+)["']`, 'i'))
+           || html.match(new RegExp(`<meta[^>]+content=["']([^"']+)["'][^>]+property=["']${prop}["']`, 'i'));
+    return m?.[1]?.trim() ?? null;
+  };
+  const getMeta = (name) => {
+    const m = html.match(new RegExp(`<meta[^>]+name=["']${name}["'][^>]+content=["']([^"']+)["']`, 'i'))
+           || html.match(new RegExp(`<meta[^>]+content=["']([^"']+)["'][^>]+name=["']${name}["']`, 'i'));
+    return m?.[1]?.trim() ?? null;
+  };
+  const getTitle = () => {
+    const m = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+    return m?.[1]?.trim() ?? null;
+  };
+
+  let image = get('og:image') || getMeta('twitter:image:src') || getMeta('twitter:image') || null;
+  // Make relative image URLs absolute
+  if (image && !image.startsWith('http')) {
+    try { image = new URL(image, url).href; } catch { image = null; }
+  }
+
+  return {
+    title: get('og:title') || getMeta('twitter:title') || getTitle() || new URL(url).hostname,
+    desc:  get('og:description') || getMeta('description') || getMeta('twitter:description') || '',
+    image,
+    site:  get('og:site_name') || new URL(url).hostname,
+  };
+}
+
+// ── Main export ────────────────────────────────────────────────
+/**
+ * Fetch OG data for a URL.
+ * Returns { title, desc, image, site } or null on failure.
+ * Results cached in memory + og-cache.json.
+ */
+async function fetchOG(url) {
+  // 1. Memory cache
+  if (memCache.has(url)) {
+    const v = memCache.get(url);
+    return v === 'error' ? null : v;
+  }
+
+  // 2. Disk cache
+  if (diskCache[url]) {
+    const data = diskCache[url].data;
+    memCache.set(url, data);
+    return data;
+  }
+
+  // 3. Deduplicate concurrent requests
+  if (inFlight.has(url)) return inFlight.get(url);
+
+  const promise = (async () => {
+    try {
+      const html = await fetchHtml(url);
+      const data = parseOG(html, url);
+      memCache.set(url, data);
+      diskCache[url] = { data, cachedAt: Date.now() };
+      saveDiskCache();
+      return data;
+    } catch (e) {
+      memCache.set(url, 'error');
+      return null;
+    } finally {
+      inFlight.delete(url);
+    }
+  })();
+
+  inFlight.set(url, promise);
+  return promise;
+}
+
+/**
+ * Extract all HTTP(S) URLs from a string.
+ */
+function extractUrls(text) {
+  if (!text) return [];
+  return [...text.matchAll(/(https?:\/\/[^\s<>"']+)/g)].map(m => m[1]);
+}
+
+/**
+ * Fetch OG data for all URLs in a message content string.
+ * Returns a map of url → OGData (only successful fetches).
+ */
+async function fetchOGForMessage(content) {
+  const urls  = extractUrls(content);
+  if (!urls.length) return {};
+  const results = {};
+  await Promise.allSettled(
+    urls.map(async url => {
+      const data = await fetchOG(url);
+      if (data) results[url] = data;
+    })
+  );
+  return results;
+}
+
+module.exports = { fetchOG, fetchOGForMessage, extractUrls };
