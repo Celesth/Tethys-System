@@ -1,0 +1,24 @@
+id = "1376406981069377617"
+name = "[Sirwobligobble] Lumine's Teyvat Services"
+archived = true
+locked = false
+createdAt = "2025-05-26T03:49:56.692Z"
+autoArchiveDuration = 4320
+messageCount = 1
+appliedTags = []
+
+[[messages]]
+id = "1376406981069377617"
+author = "korieuko"
+content = "https://rule34video.com/video/3647468/sirwobligobble-lumine-s-teyvat-services/"
+createdAt = "2025-05-26T03:49:56.692Z"
+pinned = false
+attachments = ""
+thumbnail = "https://rule34video.com/contents/videos_screenshots/3647000/3647468/preview.jpg"
+
+[[messages.linkPreviews]]
+url = "https://rule34video.com/video/3647468/sirwobligobble-lumine-s-teyvat-services/"
+title = "[Sirwobligobble] Lumine's Teyvat Services"
+image = "https://rule34video.com/contents/videos_screenshots/3647000/3647468/preview.jpg"
+site = "rule34video.com"
+desc = ""

@@ -1,0 +1,24 @@
+id = "1404846090318119052"
+name = "[HSR] Hysilens 1 [Spectre]"
+archived = true
+locked = false
+createdAt = "2025-08-12T15:16:48.710Z"
+autoArchiveDuration = 4320
+messageCount = 1
+appliedTags = []
+
+[[messages]]
+id = "1404846090318119052"
+author = "korieuko"
+content = "https://rule34video.com/video/3947389/hsr-hysilens-1-spectre/"
+createdAt = "2025-08-12T15:16:48.710Z"
+pinned = false
+attachments = ""
+thumbnail = "https://rule34video.com/contents/videos_screenshots/3947000/3947389/preview.jpg"
+
+[[messages.linkPreviews]]
+url = "https://rule34video.com/video/3947389/hsr-hysilens-1-spectre/"
+title = "[HSR] Hysilens 1 [Spectre]"
+image = "https://rule34video.com/contents/videos_screenshots/3947000/3947389/preview.jpg"
+site = "rule34video.com"
+desc = ""

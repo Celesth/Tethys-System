@@ -1,0 +1,12 @@
+id = "1348499145450852384"
+name = "HoloLive"
+guildId = "1314839006717935696"
+guildName = "Invrs ✦ NSFW"
+backedUpAt = "2026-03-08T12:47:13.750Z"
+contents = ["forum: forum-houshou-marine", "forum: forum-ourokronii", "forum: forum-usada-pekora-pekomama", "forum: forum-takanashi-kirara", "forum: forum-shirogane-noel"]
+
+[stats]
+totalForums = 5
+totalChannels = 0
+totalThreads = 7
+totalMessages = 7

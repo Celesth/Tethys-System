@@ -1,0 +1,24 @@
+id = "1373237970051661854"
+name = "Shenhe"
+archived = true
+locked = false
+createdAt = "2025-05-17T09:57:25.588Z"
+autoArchiveDuration = 4320
+messageCount = 1
+appliedTags = []
+
+[[messages]]
+id = "1373237970051661854"
+author = "korieuko"
+content = "https://rule34video.com/video/3416074/shenhe8/"
+createdAt = "2025-05-17T09:57:25.588Z"
+pinned = false
+attachments = ""
+thumbnail = "https://rule34video.com/contents/videos_screenshots/3416000/3416074/preview.jpg"
+
+[[messages.linkPreviews]]
+url = "https://rule34video.com/video/3416074/shenhe8/"
+title = "Shenhe"
+image = "https://rule34video.com/contents/videos_screenshots/3416000/3416074/preview.jpg"
+site = "rule34video.com"
+desc = ""

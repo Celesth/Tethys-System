@@ -1,0 +1,24 @@
+id = "1463024860279345152"
+name = "Columbina"
+archived = true
+locked = false
+createdAt = "2026-01-20T04:18:28.378Z"
+autoArchiveDuration = 4320
+messageCount = 1
+appliedTags = []
+
+[[messages]]
+id = "1463024860279345152"
+author = "korieuko"
+content = "https://rule34video.com/video/4204545/columbina4/"
+createdAt = "2026-01-20T04:18:28.378Z"
+pinned = false
+attachments = ""
+thumbnail = "https://rule34video.com/contents/videos_screenshots/4204000/4204545/preview.jpg"
+
+[[messages.linkPreviews]]
+url = "https://rule34video.com/video/4204545/columbina4/"
+title = "Columbina"
+image = "https://rule34video.com/contents/videos_screenshots/4204000/4204545/preview.jpg"
+site = "rule34video.com"
+desc = ""

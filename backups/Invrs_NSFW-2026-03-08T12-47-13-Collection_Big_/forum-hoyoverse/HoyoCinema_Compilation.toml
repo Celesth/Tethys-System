@@ -1,0 +1,24 @@
+id = "1457733122077753617"
+name = "HoyoCinema Compilation"
+archived = true
+locked = false
+createdAt = "2026-01-05T13:50:59.675Z"
+autoArchiveDuration = 4320
+messageCount = 1
+appliedTags = []
+
+[[messages]]
+id = "1457733122077753617"
+author = "korieuko"
+content = "https://rule34video.com/video/4182572/hoyocinema-compilation2/"
+createdAt = "2026-01-05T13:50:59.675Z"
+pinned = false
+attachments = ""
+thumbnail = "https://rule34video.com/contents/videos_screenshots/4182000/4182572/preview.jpg"
+
+[[messages.linkPreviews]]
+url = "https://rule34video.com/video/4182572/hoyocinema-compilation2/"
+title = "HoyoCinema Compilation"
+image = "https://rule34video.com/contents/videos_screenshots/4182000/4182572/preview.jpg"
+site = "rule34video.com"
+desc = ""

@@ -1,0 +1,24 @@
+id = "1475846441019637873"
+name = "Hot Laevatain"
+archived = false
+locked = false
+createdAt = "2026-02-24T13:26:51.440Z"
+autoArchiveDuration = 4320
+messageCount = 1
+appliedTags = []
+
+[[messages]]
+id = "1475846441019637873"
+author = "korieuko"
+content = "https://rule34video.com/video/4258374/hot-laevatain2/"
+createdAt = "2026-02-24T13:26:51.440Z"
+pinned = false
+attachments = ""
+thumbnail = "https://rule34video.com/contents/videos_screenshots/4258000/4258374/preview.jpg"
+
+[[messages.linkPreviews]]
+url = "https://rule34video.com/video/4258374/hot-laevatain2/"
+title = "Hot Laevatain"
+image = "https://rule34video.com/contents/videos_screenshots/4258000/4258374/preview.jpg"
+site = "rule34video.com"
+desc = ""

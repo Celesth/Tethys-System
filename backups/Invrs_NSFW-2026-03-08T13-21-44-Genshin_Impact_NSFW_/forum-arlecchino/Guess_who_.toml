@@ -1,0 +1,24 @@
+id = "1421382064082522203"
+name = "Guess who?"
+archived = true
+locked = false
+createdAt = "2025-09-27T06:24:52.079Z"
+autoArchiveDuration = 4320
+messageCount = 1
+appliedTags = []
+
+[[messages]]
+id = "1421382064082522203"
+author = "korieuko"
+content = "https://rule34video.com/video/3639914/guess-who/"
+createdAt = "2025-09-27T06:24:52.079Z"
+pinned = false
+attachments = ""
+thumbnail = "https://rule34video.com/contents/videos_screenshots/3639000/3639914/preview.jpg"
+
+[[messages.linkPreviews]]
+url = "https://rule34video.com/video/3639914/guess-who/"
+title = "Guess who?"
+image = "https://rule34video.com/contents/videos_screenshots/3639000/3639914/preview.jpg"
+site = "rule34video.com"
+desc = "https://www.patreon.com/tir_al (Vote for Iuno :'v)"

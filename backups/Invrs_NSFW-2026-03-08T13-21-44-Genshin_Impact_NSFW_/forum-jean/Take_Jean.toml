@@ -1,0 +1,24 @@
+id = "1390665411581706331"
+name = "Take Jean"
+archived = true
+locked = false
+createdAt = "2025-07-04T12:07:51.435Z"
+autoArchiveDuration = 4320
+messageCount = 1
+appliedTags = []
+
+[[messages]]
+id = "1390665411581706331"
+author = "korieuko"
+content = "https://rule34video.com/video/3913749/take-jean/"
+createdAt = "2025-07-04T12:07:51.435Z"
+pinned = false
+attachments = ""
+thumbnail = "https://rule34video.com/contents/videos_screenshots/3913000/3913749/preview.jpg"
+
+[[messages.linkPreviews]]
+url = "https://rule34video.com/video/3913749/take-jean/"
+title = "Take Jean"
+image = "https://rule34video.com/contents/videos_screenshots/3913000/3913749/preview.jpg"
+site = "rule34video.com"
+desc = ""

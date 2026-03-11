@@ -1,0 +1,24 @@
+id = "1447931091414552687"
+name = "Arlecchino BBC"
+archived = true
+locked = false
+createdAt = "2025-12-09T12:41:13.452Z"
+autoArchiveDuration = 1440
+messageCount = 1
+appliedTags = []
+
+[[messages]]
+id = "1447931091414552687"
+author = "korieuko"
+content = "https://rule34video.com/video/4137791/arlecchino-bbc/"
+createdAt = "2025-12-09T12:41:13.452Z"
+pinned = false
+attachments = ""
+thumbnail = "https://rule34video.com/contents/videos_screenshots/4137000/4137791/preview.jpg"
+
+[[messages.linkPreviews]]
+url = "https://rule34video.com/video/4137791/arlecchino-bbc/"
+title = "Arlecchino BBC"
+image = "https://rule34video.com/contents/videos_screenshots/4137000/4137791/preview.jpg"
+site = "rule34video.com"
+desc = ""
