@@ -1,8 +1,10 @@
 const { Events } = require('discord.js');
 const { checkPerms } = require('../utils/checkPerms');
 const sayCmd     = require('../commands/utility/say');
-/**const roleAdmCmd    = require('../commands/moderation/roleadmin');*/
-const rouletteCmd   = require('../commands/fun/roulette');
+// const roleAdmCmd    = require('../commands/moderation/roleadmin');
+const rouletteCmd    = require('../commands/fun/roulette');
+const domainClashCmd  = require('../commands/fun/domainclash');
+const domainPrefixCmd = require('../commands/fun/domainPrefix');
 
 module.exports = {
   name: Events.InteractionCreate,
@@ -54,6 +56,33 @@ module.exports = {
         await rouletteCmd.handleComponent(interaction);
       } catch (err) {
         console.error('[ERROR] /roulette component handler:', err);
+      }
+      return;
+    }
+
+    // ── /domainclash buttons + modals ────────────────────────────
+    if (
+      (interaction.isButton()      && interaction.customId.startsWith('dc:')) ||
+      (interaction.isModalSubmit() && interaction.customId.startsWith('dc:'))
+    ) {
+      try {
+        await domainClashCmd.handleComponent(interaction);
+      } catch (err) {
+        console.error('[ERROR] /domainclash component handler:', err);
+      }
+      return;
+    }
+
+    // ── >domain* prefix cmd buttons/modals/selects ───────────
+    if (
+      (interaction.isButton()            && interaction.customId.startsWith('dp:')) ||
+      (interaction.isModalSubmit()       && interaction.customId.startsWith('dp:')) ||
+      (interaction.isStringSelectMenu()  && interaction.customId.startsWith('dp:'))
+    ) {
+      try {
+        await domainPrefixCmd.handleComponent(interaction);
+      } catch (err) {
+        console.error('[ERROR] domainPrefix component handler:', err);
       }
       return;
     }

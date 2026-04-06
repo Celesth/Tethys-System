@@ -48,4 +48,15 @@ for (const file of eventFiles) {
   }
 }
 
+// ── Prefix command handler (>domaincreate etc) ────────────────
+const domainPrefixCmd = require('./commands/fun/domainPrefix');
+
+client.on('messageCreate', async (message) => {
+  try {
+    await domainPrefixCmd.handleMessage(message);
+  } catch (err) {
+    console.error('[messageCreate] domainPrefix error:', err);
+  }
+});
+
 client.login(process.env.DISCORD_TOKEN);
