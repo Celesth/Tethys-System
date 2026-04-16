@@ -1,92 +1,88 @@
-/**
- * warnStore.js — persistent warning storage
- *
- * Stores warnings in data/warnings.json relative to the project root.
- * Structure: { [guildId]: { [userId]: [ { id, reason, moderator, timestamp } ] } }
- *
- * All functions are synchronous so command handlers stay simple.
- * The file is written on every mutation — fine for community-scale usage.
- */
-
-const fs   = require('fs');
+const fs = require('fs');
 const path = require('path');
 
 const DATA_DIR  = path.join(__dirname, '..', 'data');
 const WARN_FILE = path.join(DATA_DIR, 'warnings.json');
 
-// ── Load / save ────────────────────────────────────────────────
+let _cache = null;
+let _cacheTime = 0;
+const CACHE_TTL = 10_000;
+
 function load() {
-    try {
-        if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-        if (!fs.existsSync(WARN_FILE)) return {};
-        return JSON.parse(fs.readFileSync(WARN_FILE, 'utf8'));
-    } catch {
-        return {};
+  const now = Date.now();
+  if (_cache && now - _cacheTime < CACHE_TTL) return _cache;
+  try {
+    if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+    if (fs.existsSync(WARN_FILE)) {
+      _cache = JSON.parse(fs.readFileSync(WARN_FILE, 'utf8'));
+    } else {
+      _cache = {};
     }
+  } catch (err) {
+    console.error('[warnStore] Failed to load:', err);
+    _cache = {};
+  }
+  _cacheTime = now;
+  return _cache;
 }
 
 function save(data) {
-    try {
-        if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-        fs.writeFileSync(WARN_FILE, JSON.stringify(data, null, 2), 'utf8');
-    } catch (err) {
-        console.error('[warnStore] Failed to save:', err.message);
-    }
+  try {
+    if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+    const tmp = WARN_FILE + '.tmp';
+    fs.writeFileSync(tmp, JSON.stringify(data, null, 2));
+    fs.renameSync(tmp, WARN_FILE);
+    _cache = data;
+    _cacheTime = Date.now();
+  } catch (err) {
+    console.error('[warnStore] Failed to save:', err);
+  }
 }
 
-// ── Tiny ID generator (no uuid dep) ───────────────────────────
 function genId() {
-    return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 }
 
-// ── Public API ─────────────────────────────────────────────────
-
-/**
- * Add a warning for a user. Returns the created warning object.
- */
 function addWarning(guildId, userId, { reason, moderator, timestamp }) {
-    const db = load();
-    if (!db[guildId]) db[guildId] = {};
-    if (!db[guildId][userId]) db[guildId][userId] = [];
+  const db = load();
+  if (!db[guildId]) db[guildId] = {};
+  if (!db[guildId][userId]) db[guildId][userId] = [];
 
-    const warning = { id: genId(), reason, moderator, timestamp };
-    db[guildId][userId].push(warning);
-    save(db);
-    return warning;
+  const warning = { id: genId(), reason, moderator, timestamp };
+  db[guildId][userId].push(warning);
+  save(db);
+  return warning;
 }
 
-/**
- * Get all warnings for a user in a guild. Returns [] if none.
- */
 function getWarnings(guildId, userId) {
-    const db = load();
-    return db[guildId]?.[userId] ?? [];
+  const db = load();
+  return db[guildId]?.[userId] ?? [];
 }
 
-/**
- * Remove all warnings for a user in a guild.
- */
 function clearWarnings(guildId, userId) {
-    const db = load();
-    if (db[guildId]) delete db[guildId][userId];
-    save(db);
+  const db = load();
+  if (db[guildId]) delete db[guildId][userId];
+  save(db);
 }
 
-/**
- * Remove a single warning by ID. Returns true if found and removed.
- */
 function removeWarning(guildId, userId, warnId) {
-    const db = load();
-    const warns = db[guildId]?.[userId];
-    if (!warns) return false;
+  const db = load();
+  const warns = db[guildId]?.[userId];
+  if (!warns) return false;
 
-    const idx = warns.findIndex(w => w.id === warnId);
-    if (idx === -1) return false;
+  const idx = warns.findIndex(w => w.id === warnId);
+  if (idx === -1) return false;
 
-    warns.splice(idx, 1);
-    if (warns.length === 0) delete db[guildId][userId];
-    save(db);
-    return true;
+  warns.splice(idx, 1);
+  if (warns.length === 0) delete db[guildId][userId];
+  save(db);
+  return true;
 }
 
-module.exports = { addWarning, getWarnings, clearWarnings, removeWarning };
+function reload() {
+  _cache = null;
+  _cacheTime = 0;
+  return load();
+}
+
+module.exports = { addWarning, getWarnings, clearWarnings, removeWarning, reload };

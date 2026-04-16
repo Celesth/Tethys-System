@@ -1,38 +1,14 @@
-/**
- * domainStore.js — persistent domain profile storage
- *
- * Structure:
- * {
- *   [userId]: {
- *     domains: [
- *       {
- *         id,          // short unique id
- *         name,
- *         description,
- *         color,       // hex string e.g. "#f38ba8"
- *         thumbnail,   // image url
- *         victoryAnim, // gif/video url shown on win
- *         technique,   // "Binding Vow" | "Barrier" | "CT Reversal" | "Innate"
- *         tier,        // "C" | "B" | "A" | "S" | "SS"
- *         wins,
- *         losses,
- *         rct,         // bool — Reverse Cursed Technique unlocked
- *         createdAt,
- *       }
- *     ],
- *     activeIndex: 0,  // which domain is used in clashes
- *   }
- * }
- */
-
-const fs   = require('fs');
+const fs = require('fs');
 const path = require('path');
 
 const DATA_DIR    = path.join(__dirname, 'data');
 const DOMAIN_FILE = path.join(DATA_DIR, 'domains.json');
 
-// Tier thresholds (wins needed to reach each tier)
 const TIER_THRESHOLDS = { C: 0, B: 3, A: 7, S: 15, SS: 25 };
+
+let _cache = null;
+let _cacheTime = 0;
+const CACHE_TTL = 10_000;
 
 function calcTier(wins) {
   if (wins >= 25) return 'SS';
@@ -46,14 +22,20 @@ function genId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
 }
 
-// ── I/O ───────────────────────────────────────────────────────
 function load() {
+  const now = Date.now();
+  if (_cache && now - _cacheTime < CACHE_TTL) return _cache;
   try {
     if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-    if (!fs.existsSync(DOMAIN_FILE)) return {};
-    const raw = fs.readFileSync(DOMAIN_FILE, 'utf8').trim();
-    return raw ? JSON.parse(raw) : {};
-  } catch { return {}; }
+    if (fs.existsSync(DOMAIN_FILE)) {
+      const raw = fs.readFileSync(DOMAIN_FILE, 'utf8').trim();
+      _cache = raw ? JSON.parse(raw) : {};
+    } else {
+      _cache = {};
+    }
+  } catch { _cache = {}; }
+  _cacheTime = now;
+  return _cache;
 }
 
 function save(db) {
@@ -62,12 +44,12 @@ function save(db) {
     const tmp = DOMAIN_FILE + '.tmp';
     fs.writeFileSync(tmp, JSON.stringify(db, null, 2), 'utf8');
     fs.renameSync(tmp, DOMAIN_FILE);
+    _cache = db;
+    _cacheTime = Date.now();
   } catch (err) {
     console.error('[domainStore] save failed:', err.message);
   }
 }
-
-// ── Public API ────────────────────────────────────────────────
 
 function getUser(userId) {
   const db = load();
@@ -84,10 +66,9 @@ function getActiveDomain(userId) {
 }
 
 function createDomain(userId, fields) {
-  const db   = load();
+  const db = load();
   if (!db[userId]) db[userId] = { domains: [], activeIndex: 0 };
 
-  // RCT: 30% chance on creation
   const rct = Math.random() < 0.3;
 
   const domain = {
@@ -149,6 +130,12 @@ function recordLoss(userId, domainId) {
   save(db);
 }
 
+function reload() {
+  _cache = null;
+  _cacheTime = 0;
+  return load();
+}
+
 const TIER_EMOJI = { C: '⚪', B: '🟢', A: '🔵', S: '🔴', SS: '💀' };
 const TIER_COLOR = { C: 0x6c7086, B: 0xa6e3a1, A: 0x89b4fa, S: 0xf38ba8, SS: 0xcba6f7 };
 
@@ -157,4 +144,5 @@ module.exports = {
   createDomain, setActive, deleteDomain,
   recordWin, recordLoss,
   calcTier, TIER_EMOJI, TIER_COLOR,
+  reload,
 };
